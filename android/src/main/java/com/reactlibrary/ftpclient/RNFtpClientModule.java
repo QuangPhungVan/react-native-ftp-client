@@ -17,6 +17,7 @@ import com.facebook.react.bridge.Arguments;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -76,13 +77,13 @@ public class RNFtpClientModule extends ReactContextBaseJavaModule {
   }
 
 
-  private void login(FTPClient client) throws IOException{
+  private void login(FTPSClient client) throws IOException{
     client.connect(this.ip_address,this.port);
     client.enterLocalPassiveMode();
     client.login(this.username, this.password);
   }
 
-  private void logout(FTPClient client) {
+  private void logout(FTPSClient client) {
     try {
       client.logout();
     }catch (IOException e){
@@ -128,7 +129,7 @@ public class RNFtpClientModule extends ReactContextBaseJavaModule {
       @Override
       public void run() {
         FTPFile[] files = new FTPFile[0];
-        FTPClient client = new FTPClient();
+        FTPSClient client = new FTPSClient(true);
         try {
           login(client);
           files = client.listFiles(path);
@@ -157,7 +158,7 @@ public class RNFtpClientModule extends ReactContextBaseJavaModule {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        FTPClient client = new FTPClient();
+        FTPSClient client = new FTPSClient(true);
         try {
           login(client);
           if(path.endsWith(File.separator)){
@@ -222,7 +223,7 @@ public class RNFtpClientModule extends ReactContextBaseJavaModule {
     new Thread(new Runnable() {
       @Override
       public void run() {
-        FTPClient client = new FTPClient();
+        FTPSClient client = new FTPSClient(true);
         try {
           login(client);
           client.setFileType(FTP.BINARY_FILE_TYPE);
@@ -291,7 +292,7 @@ public class RNFtpClientModule extends ReactContextBaseJavaModule {
       return;
     }
     upload.interrupt();
-    FTPClient client = new FTPClient();
+    FTPSClient client = new FTPSClient(true);
     try{
       upload.join();
       login(client);
@@ -314,7 +315,7 @@ public class RNFtpClientModule extends ReactContextBaseJavaModule {
       return path;
     }
   }
-  private long getRemoteSize(FTPClient client, String remoteFilePath) throws Exception {
+  private long getRemoteSize(FTPSClient client, String remoteFilePath) throws Exception {
     client.sendCommand("SIZE", remoteFilePath);
     String[] reply = client.getReplyStrings();
     String[] response = reply[0].split(" ");
@@ -344,7 +345,7 @@ public class RNFtpClientModule extends ReactContextBaseJavaModule {
             new Thread(new Runnable() {
               @Override
               public void run() {
-                FTPClient client = new FTPClient();
+                FTPSClient client = new FTPSClient(true);
                 try {
                   login(client);
                   client.setFileType(FTP.BINARY_FILE_TYPE);
